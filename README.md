@@ -1,1 +1,105 @@
 # Compass
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Домой</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; background: #0a0a0f; color: #e8e4dc; font-family: 'Courier New', monospace; overflow: hidden; touch-action: none; }
+    .app { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 48px 24px 40px; }
+    .top-label { font-size: 11px; letter-spacing: 0.3em; color: #4a4a5e; text-transform: uppercase; }
+    .compass-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+    .ring-outer { position: absolute; width: 320px; height: 320px; border-radius: 50%; border: 1px solid rgba(74,74,94,0.3); animation: spin 30s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ticks { position: absolute; width: 320px; height: 320px; }
+    .compass { width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #1a1a28 0%, #0d0d16 70%); border: 1.5px solid rgba(255,255,255,0.08); box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06); position: relative; display: flex; align-items: center; justify-content: center; transition: box-shadow 0.5s, border-color 0.5s; }
+    .compass.locked { border-color: rgba(255,77,28,0.4); box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 40px rgba(255,77,28,0.12); }
+    .cardinal { position: absolute; font-size: 16px; font-weight: bold; color: #4a4a5e; pointer-events: none; }
+    .cardinal.N { top: 16px; left: 50%; transform: translateX(-50%); color: #ff4d1c; }
+    .cardinal.S { bottom: 16px; left: 50%; transform: translateX(-50%); }
+    .cardinal.E { right: 16px; top: 50%; transform: translateY(-50%); }
+    .cardinal.W { left: 16px; top: 50%; transform: translateY(-50%); }
+    .needle-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .needle { position: relative; width: 12px; height: 220px; display: flex; flex-direction: column; align-items: center; }
+    .needle-north { flex: 1; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 110px solid #ff4d1c; filter: drop-shadow(0 0 8px rgba(255,77,28,0.5)); }
+    .needle-south { flex: 1; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 110px solid #2a2a3e; }
+    .center-dot { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #ff4d1c; box-shadow: 0 0 12px rgba(255,77,28,0.5); z-index: 10; }
+    .distance-wrap { text-align: center; }
+    .distance-value { font-size: 72px; line-height: 1; font-weight: bold; color: #e8e4dc; }
+    .distance-unit { font-size: 11px; letter-spacing: 0.25em; color: #4a4a5e; margin-top: 4px; }
+    .distance-label { font-size: 10px; letter-spacing: 0.2em; color: #ff4d1c; margin-top: 8px; }
+    .status-bar { display: flex; gap: 24px; align-items: center; }
+    .status-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .status-val { font-size: 13px; font-weight: bold; color: #e8e4dc; }
+    .status-key { font-size: 9px; letter-spacing: 0.2em; color: #4a4a5e; text-transform: uppercase; }
+    .divider { width: 1px; height: 28px; background: #1e1e2e; }
+    .overlay { position: fixed; inset: 0; background: #0a0a0f; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 32px; text-align: center; }
+    .overlay-title { font-size: 28px; font-weight: bold; letter-spacing: 0.1em; color: #e8e4dc; }
+    .overlay-text { font-size: 13px; line-height: 1.8; color: #4a4a5e; max-width: 280px; }
+    .btn { margin-top: 8px; padding: 14px 36px; border: 1.5px solid #ff4d1c; background: transparent; color: #ff4d1c; font-family: 'Courier New', monospace; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; border-radius: 2px; }
+    .btn:active { background: #ff4d1c; color: #0a0a0f; }
+    .hidden { display: none !important; }
+    .error-msg { color: #ff4d1c; font-size: 12px; line-height: 1.7; max-width: 280px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="overlay" id="overlay">
+  <div style="font-size:56px;margin-bottom:8px">🏠</div>
+  <div class="overlay-title">КОМПАС ДОМОЙ</div>
+  <div class="overlay-text">Стрелка укажет точное направление к твоей квартире, куда бы ты ни пошёл</div>
+  <button class="btn" id="startBtn">Запустить</button>
+  <div class="error-msg hidden" id="errorMsg"></div>
+</div>
+<div class="app hidden" id="mainApp">
+  <div class="top-label">навигация · домой</div>
+  <div class="compass-wrap">
+    <div class="ring-outer"></div>
+    <div class="ticks" id="ticks"></div>
+    <div class="compass" id="compass">
+      <span class="cardinal N">С</span>
+      <span class="cardinal S">Ю</span>
+      <span class="cardinal E">В</span>
+      <span class="cardinal W">З</span>
+      <div class="needle-wrap" id="needleWrap">
+        <div class="needle">
+          <div class="needle-north"></div>
+          <div class="needle-south"></div>
+        </div>
+      </div>
+      <div class="center-dot"></div>
+    </div>
+  </div>
+  <div class="distance-wrap">
+    <div class="distance-value" id="distVal">—</div>
+    <div class="distance-unit" id="distUnit">МЕТРОВ ДО ДОМА</div>
+    <div class="distance-label" id="distLabel">ожидание сигнала...</div>
+  </div>
+  <div class="status-bar">
+    <div class="status-item"><span class="status-val" id="latVal">—</span><span class="status-key">широта</span></div>
+    <div class="divider"></div>
+    <div class="status-item"><span class="status-val" id="lngVal">—</span><span class="status-key">долгота</span></div>
+    <div class="divider"></div>
+    <div class="status-item"><span class="status-val" id="bearVal">—°</span><span class="status-key">курс</span></div>
+  </div>
+</div>
+<script>
+  const HOME_LAT=54.5193,HOME_LNG=36.2730;
+  let targetBearing=0,currentHeading=0,smoothAngle=0,hasLocation=false;
+  const ticksEl=document.getElementById('ticks');
+  for(let i=0;i<72;i++){const t=document.createElement('div'),major=i%9===0;t.style.cssText=`position:absolute;left:50%;top:50%;width:${major?2:1}px;height:${major?18:10}px;background:${major?'#e8e4dc':'#4a4a5e'};opacity:${major?0.7:0.4};transform-origin:0 -160px;transform:rotate(${i*5}deg) translateX(-50%);`;ticksEl.appendChild(t);}
+  function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,e=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(e),Math.sqrt(1-e));}
+  function calcBearing(a,b,c,d){const p1=a*Math.PI/180,p2=c*Math.PI/180,dl=(d-b)*Math.PI/180,y=Math.sin(dl)*Math.cos(p2),x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);return(Math.atan2(y,x)*180/Math.PI+360)%360;}
+  function animate(){if(hasLocation){const raw=targetBearing-currentHeading,delta=((raw-smoothAngle+540)%360)-180;smoothAngle=(smoothAngle+delta*0.12+360)%360;document.getElementById('needleWrap').style.transform=`rotate(${smoothAngle}deg)`;}requestAnimationFrame(animate);}
+  function startLocation(){navigator.geolocation.watchPosition(pos=>{const{latitude:lat,longitude:lng,accuracy:acc}=pos.coords;hasLocation=true;const dist=haversine(lat,lng,HOME_LAT,HOME_LNG);targetBearing=calcBearing(lat,lng,HOME_LAT,HOME_LNG);document.getElementById('distVal').textContent=dist<1000?Math.round(dist):(dist/1000).toFixed(1);document.getElementById('distUnit').textContent=dist<1000?'МЕТРОВ ДО ДОМА':'КМ ДО ДОМА';document.getElementById('distLabel').textContent=dist<30?'🏠 ты дома!':`точность ±${Math.round(acc)}м`;document.getElementById('latVal').textContent=lat.toFixed(4);document.getElementById('lngVal').textContent=lng.toFixed(4);document.getElementById('bearVal').textContent=Math.round(targetBearing)+'°';if(dist<30)document.getElementById('compass').classList.add('locked');},err=>{showError(err.code===1?'Геолокация запрещена. Разреши в настройках браузера.':'Ошибка: '+err.message);},{enableHighAccuracy:true,maximumAge:1000});}
+  function startOrientation(){const listen=()=>{window.addEventListener('deviceorientationabsolute',onOrient,true);window.addEventListener('deviceorientation',onOrient,true);};typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'?DeviceOrientationEvent.requestPermission().then(s=>{if(s==='granted')listen();}).catch(()=>{}):listen();}
+  function onOrient(e){if(e.webkitCompassHeading!=null)currentHeading=e.webkitCompassHeading;else if(e.alpha!=null)currentHeading=(360-e.alpha)%360;}
+  function showError(msg){const el=document.getElementById('errorMsg');el.textContent=msg;el.classList.remove('hidden');}
+  document.getElementById('startBtn').addEventListener('click',()=>{document.getElementById('overlay').classList.add('hidden');document.getElementById('mainApp').classList.remove('hidden');startLocation();startOrientation();requestAnimationFrame(animate);});
+</script>
+</body>
+</html>
