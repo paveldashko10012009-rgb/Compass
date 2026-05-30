@@ -9,12 +9,7 @@
   <title>Домой</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23382712'/><rect x='1' y='1' width='14' height='14' fill='%236b4c2a'/><rect x='2' y='2' width='12' height='12' fill='%23382712'/><rect x='6' y='3' width='4' height='4' fill='%23ff3333'/><rect x='6' y='9' width='4' height='4' fill='%23eeeeee'/><rect x='3' y='6' width='4' height='4' fill='%23eeeeee'/><rect x='9' y='6' width='4' height='4' fill='%23eeeeee'/><rect x='7' y='7' width='2' height='2' fill='%23aaaaaa'/></svg>">
   <style>
-    @font-face {
-      font-family: 'Minecraft';
-      src: url('https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK0nR.woff2') format('woff2');
-    }
     * { margin: 0; padding: 0; box-sizing: border-box; image-rendering: pixelated; }
-
     html, body {
       height: 100%;
       background: #1a1a1a;
@@ -23,29 +18,13 @@
       overflow: hidden;
       touch-action: none;
     }
-
-    /* Pixelated sky/dirt background */
     body {
       background-color: #1a1a1a;
       background-image:
-        linear-gradient(rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.7) 100%),
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 31px,
-          rgba(0,0,0,0.3) 31px,
-          rgba(0,0,0,0.3) 32px
-        ),
-        repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 31px,
-          rgba(0,0,0,0.3) 31px,
-          rgba(0,0,0,0.3) 32px
-        );
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.3) 31px, rgba(0,0,0,0.3) 32px),
+        repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,0.3) 31px, rgba(0,0,0,0.3) 32px);
       background-size: 32px 32px;
     }
-
     .app {
       height: 100%;
       display: flex;
@@ -53,12 +32,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 48px 24px 36px;
-      position: relative;
     }
-
-    /* TOP LABEL */
     .top-label {
-      font-family: 'Courier New', monospace;
       font-size: 10px;
       letter-spacing: 0.2em;
       color: #aaaaaa;
@@ -66,7 +41,7 @@
       text-shadow: 2px 2px 0 #000;
     }
 
-    /* COMPASS WRAP */
+    /* ===== PIXEL COMPASS ===== */
     .compass-outer {
       position: relative;
       display: flex;
@@ -74,140 +49,15 @@
       justify-content: center;
     }
 
-    /* Minecraft wooden frame — pixel border */
-    .mc-frame {
-      position: absolute;
-      width: 290px;
-      height: 290px;
-      background: transparent;
+    /* The canvas-based pixel compass */
+    #compassCanvas {
+      width: 280px;
+      height: 280px;
+      image-rendering: pixelated;
     }
 
-    /* Pixel border using box-shadow trick */
-    .mc-frame::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border: 8px solid #6b4c2a;
-      box-shadow:
-        0 0 0 4px #382712,
-        0 0 0 8px #8b6914,
-        inset 0 0 0 4px #382712;
-    }
-
-    /* The compass circle */
-    .compass {
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 50%, #2a2a2a 0%, #1a1a1a 80%);
-      border: 4px solid #555;
-      box-shadow:
-        0 0 0 2px #000,
-        inset 0 0 0 2px #333,
-        0 4px 20px rgba(0,0,0,0.8);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    /* Pixel grid overlay on compass */
-    .compass::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(255,255,255,0.03) 15px, rgba(255,255,255,0.03) 16px),
-        repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(255,255,255,0.03) 15px, rgba(255,255,255,0.03) 16px);
-      pointer-events: none;
-    }
-
-    /* Cardinal directions — Minecraft style pixel text */
-    .cardinal {
-      position: absolute;
-      font-family: 'Courier New', monospace;
-      font-size: 18px;
-      font-weight: bold;
-      color: #ffffff;
-      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
-      pointer-events: none;
-      letter-spacing: 0;
-    }
-    .cardinal.N { top: 14px; left: 50%; transform: translateX(-50%); color: #ff3333; text-shadow: 2px 2px 0 #660000, -1px -1px 0 #000; }
-    .cardinal.S { bottom: 14px; left: 50%; transform: translateX(-50%); }
-    .cardinal.E { right: 14px; top: 50%; transform: translateY(-50%); }
-    .cardinal.W { left: 14px; top: 50%; transform: translateY(-50%); }
-
-    /* Tick marks — pixelated */
-    .ticks { position: absolute; width: 260px; height: 260px; pointer-events: none; }
-
-    /* Needle wrap */
-    .needle-wrap {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Minecraft compass needle — pixel style */
-    .needle {
-      position: relative;
-      width: 20px;
-      height: 200px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .needle-north {
-      flex: 1;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 100px solid #ff3333;
-      filter: drop-shadow(0 0 4px rgba(255,0,0,0.6));
-    }
-
-    .needle-south {
-      flex: 1;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 100px solid #eeeeee;
-      filter: drop-shadow(0 0 2px rgba(200,200,200,0.4));
-    }
-
-    /* Center pixel */
-    .center-dot {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: #aaaaaa;
-      border: 2px solid #000;
-      z-index: 10;
-    }
-
-    /* Locked state */
-    .compass.locked {
-      box-shadow:
-        0 0 0 2px #000,
-        inset 0 0 0 2px #333,
-        0 0 30px rgba(255, 200, 0, 0.4),
-        0 4px 20px rgba(0,0,0,0.8);
-    }
-
-    /* DISTANCE — Minecraft inventory style box */
-    .distance-wrap {
-      text-align: center;
-    }
-
+    /* DISTANCE */
+    .distance-wrap { text-align: center; }
     .mc-box {
       display: inline-block;
       background: #1a1a1a;
@@ -216,7 +66,6 @@
       padding: 12px 28px;
       position: relative;
     }
-
     .mc-box::before {
       content: '';
       position: absolute;
@@ -224,9 +73,7 @@
       border: 1px solid #333;
       pointer-events: none;
     }
-
     .distance-value {
-      font-family: 'Courier New', monospace;
       font-size: 56px;
       font-weight: bold;
       line-height: 1;
@@ -234,7 +81,6 @@
       text-shadow: 3px 3px 0 #555;
       letter-spacing: -2px;
     }
-
     .distance-unit {
       font-size: 10px;
       letter-spacing: 0.15em;
@@ -242,7 +88,6 @@
       margin-top: 4px;
       text-shadow: 1px 1px 0 #000;
     }
-
     .distance-label {
       font-size: 11px;
       color: #ffcc00;
@@ -251,13 +96,8 @@
       letter-spacing: 0.1em;
     }
 
-    /* STATUS BAR — like Minecraft hotbar */
-    .status-bar {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-
+    /* STATUS */
+    .status-bar { display: flex; gap: 4px; align-items: center; }
     .status-slot {
       background: #1a1a1a;
       border: 3px solid #555;
@@ -269,91 +109,32 @@
       gap: 3px;
       min-width: 80px;
     }
-
-    .status-val {
-      font-size: 13px;
-      font-weight: bold;
-      color: #ffffff;
-      text-shadow: 2px 2px 0 #000;
-    }
-
-    .status-key {
-      font-size: 8px;
-      letter-spacing: 0.15em;
-      color: #aaaaaa;
-      text-transform: uppercase;
-      text-shadow: 1px 1px 0 #000;
-    }
+    .status-val { font-size: 13px; font-weight: bold; color: #ffffff; text-shadow: 2px 2px 0 #000; }
+    .status-key { font-size: 8px; letter-spacing: 0.15em; color: #aaaaaa; text-transform: uppercase; text-shadow: 1px 1px 0 #000; }
 
     /* OVERLAY */
     .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.92);
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      padding: 32px;
-      text-align: center;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 50;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 16px; padding: 32px; text-align: center;
     }
-
-    .mc-title {
-      font-family: 'Courier New', monospace;
-      font-size: 24px;
-      font-weight: bold;
-      color: #ffffff;
-      text-shadow: 3px 3px 0 #555;
-      letter-spacing: 0.05em;
-      line-height: 1.3;
-    }
-
-    .mc-subtitle {
-      font-size: 12px;
-      line-height: 1.8;
-      color: #aaaaaa;
-      max-width: 280px;
-      text-shadow: 1px 1px 0 #000;
-    }
-
-    /* Minecraft button */
+    .mc-title { font-size: 24px; font-weight: bold; color: #ffffff; text-shadow: 3px 3px 0 #555; letter-spacing: 0.05em; }
+    .mc-subtitle { font-size: 12px; line-height: 1.8; color: #aaaaaa; max-width: 280px; text-shadow: 1px 1px 0 #000; }
     .mc-btn {
-      margin-top: 8px;
-      padding: 12px 32px;
+      margin-top: 8px; padding: 12px 32px;
       background: #555555;
       border: none;
-      border-top: 3px solid #888888;
-      border-left: 3px solid #888888;
-      border-bottom: 3px solid #222222;
-      border-right: 3px solid #222222;
-      color: #ffffff;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      font-weight: bold;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      text-shadow: 2px 2px 0 #000;
-      active: background #666;
+      border-top: 3px solid #888888; border-left: 3px solid #888888;
+      border-bottom: 3px solid #222222; border-right: 3px solid #222222;
+      color: #ffffff; font-family: 'Courier New', monospace;
+      font-size: 14px; font-weight: bold; letter-spacing: 0.1em;
+      cursor: pointer; text-shadow: 2px 2px 0 #000;
     }
-
     .mc-btn:active {
-      background: #666666;
-      border-top: 3px solid #222222;
-      border-left: 3px solid #222222;
-      border-bottom: 3px solid #888888;
-      border-right: 3px solid #888888;
+      border-top: 3px solid #222; border-left: 3px solid #222;
+      border-bottom: 3px solid #888; border-right: 3px solid #888;
     }
-
-    .error-msg {
-      color: #ff3333;
-      font-size: 11px;
-      line-height: 1.7;
-      max-width: 280px;
-      text-shadow: 1px 1px 0 #000;
-    }
-
+    .error-msg { color: #ff3333; font-size: 11px; line-height: 1.7; max-width: 280px; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -371,21 +152,7 @@
   <div class="top-label">// навигация · домой //</div>
 
   <div class="compass-outer">
-    <div class="mc-frame"></div>
-    <div class="compass" id="compass">
-      <div class="ticks" id="ticks"></div>
-      <span class="cardinal N">С</span>
-      <span class="cardinal S">Ю</span>
-      <span class="cardinal E">В</span>
-      <span class="cardinal W">З</span>
-      <div class="needle-wrap" id="needleWrap">
-        <div class="needle">
-          <div class="needle-north"></div>
-          <div class="needle-south"></div>
-        </div>
-      </div>
-      <div class="center-dot"></div>
-    </div>
+    <canvas id="compassCanvas" width="280" height="280"></canvas>
   </div>
 
   <div class="distance-wrap">
@@ -397,39 +164,191 @@
   </div>
 
   <div class="status-bar">
-    <div class="status-slot">
-      <span class="status-val" id="latVal">—</span>
-      <span class="status-key">широта</span>
-    </div>
-    <div class="status-slot">
-      <span class="status-val" id="lngVal">—</span>
-      <span class="status-key">долгота</span>
-    </div>
-    <div class="status-slot">
-      <span class="status-val" id="bearVal">—°</span>
-      <span class="status-key">курс</span>
-    </div>
+    <div class="status-slot"><span class="status-val" id="latVal">—</span><span class="status-key">широта</span></div>
+    <div class="status-slot"><span class="status-val" id="lngVal">—</span><span class="status-key">долгота</span></div>
+    <div class="status-slot"><span class="status-val" id="bearVal">—°</span><span class="status-key">курс</span></div>
   </div>
 </div>
 
 <script>
-  const HOME_LAT=54.5193,HOME_LNG=36.2730;
-  let targetBearing=0,currentHeading=0,smoothAngle=0,hasLocation=false;
+  const HOME_LAT=54.5193, HOME_LNG=36.2730;
+  let targetBearing=0, currentHeading=0, smoothAngle=0, hasLocation=false;
 
-  // Pixel tick marks
-  const ticksEl=document.getElementById('ticks');
-  for(let i=0;i<36;i++){
-    const t=document.createElement('div'),major=i%9===0;
-    t.style.cssText=`position:absolute;left:50%;top:50%;width:${major?4:2}px;height:${major?16:8}px;background:${major?'#ffffff':'#666666'};opacity:${major?0.8:0.5};transform-origin:0 -130px;transform:rotate(${i*10}deg) translateX(-50%);`;
-    ticksEl.appendChild(t);
+  // ===== PIXEL COMPASS RENDERER =====
+  const canvas = document.getElementById('compassCanvas');
+  const ctx = canvas.getContext('2d');
+  const S = 280; // canvas size
+  const C = S/2; // center
+  ctx.imageSmoothingEnabled = false;
+
+  // Pixel size for the minecraft look
+  const PX = 8;
+
+  function drawPixel(x, y, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x * PX, y * PX, PX, PX);
   }
 
+  // Draw the static compass body (pixel art circle)
+  // 35x35 grid
+  const GRID = 35;
+
+  // Precomputed pixel compass body — concentric rings like MC
+  function drawCompassBody() {
+    ctx.clearRect(0, 0, S, S);
+    const cx = GRID/2, cy = GRID/2, r = 16;
+
+    for(let y = 0; y < GRID; y++) {
+      for(let x = 0; x < GRID; x++) {
+        const dx = x - cx + 0.5, dy = y - cy + 0.5;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        if(dist > r + 0.5) continue; // outside
+
+        let color;
+        if(dist > r - 0.5) {
+          // Outer ring - black
+          color = '#000000';
+        } else if(dist > r - 2) {
+          // Dark gray ring
+          color = '#2a2a2a';
+        } else if(dist > r - 3) {
+          // Medium gray
+          color = '#3a3a3a';
+        } else if(dist > r - 4) {
+          // Lighter gray highlights (top-left lighter, bottom-right darker)
+          if(dx < 0 && dy < 0) color = '#666666';
+          else if(dx > 0 && dy > 0) color = '#222222';
+          else color = '#444444';
+        } else if(dist > r - 6) {
+          // Inner ring variation
+          const angle = Math.atan2(dy, dx);
+          const sector = Math.floor(((angle + Math.PI) / (2*Math.PI)) * 8);
+          const grays = ['#1a1a1a','#222222','#1e1e1e','#181818','#1a1a1a','#202020','#1c1c1c','#181818'];
+          color = grays[sector % 8];
+        } else {
+          // Inner fill - very dark with slight variation
+          if(dist < 4) color = '#111111';
+          else {
+            const nx = dx/dist, ny = dy/dist;
+            const light = (nx*(-0.7) + ny*(-0.7) + 1) / 2;
+            const v = Math.floor(14 + light * 12);
+            color = `rgb(${v},${v},${v})`;
+          }
+        }
+        drawPixel(x, y, color);
+      }
+    }
+
+    // Cardinal tick marks
+    const ticks = [
+      {x:17,y:2,w:1,h:2,c:'#ff4444'}, // N
+      {x:17,y:31,w:1,h:2,c:'#888888'}, // S
+      {x:2,y:17,w:2,h:1,c:'#888888'},  // W
+      {x:31,y:17,w:2,h:1,c:'#888888'}, // E
+    ];
+    ticks.forEach(t => {
+      ctx.fillStyle = t.c;
+      ctx.fillRect(t.x*PX, t.y*PX, t.w*PX, t.h*PX);
+    });
+
+    // Cardinal letters
+    ctx.font = `bold ${PX*2}px 'Courier New'`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ff4444';
+    ctx.shadowColor = '#000';
+    ctx.shadowBlur = 2;
+    ctx.fillText('С', C, PX*3.5);
+    ctx.fillStyle = '#888888';
+    ctx.fillText('Ю', C, S - PX*3.5);
+    ctx.fillText('З', PX*3.5, C);
+    ctx.fillText('В', S - PX*3.5, C);
+    ctx.shadowBlur = 0;
+  }
+
+  function drawNeedle(angle) {
+    ctx.save();
+    ctx.translate(C, C);
+    ctx.rotate(angle * Math.PI / 180);
+
+    // Pixel needle — blocky like Minecraft
+    // Red north half
+    const redPixels = [
+      // stepped triangle going up
+      [0,-1],[0,-2],[0,-3],[0,-4],[0,-5],[0,-6],[0,-7],[0,-8],[0,-9],[0,-10],
+      [-1,-3],[-1,-4],[-1,-5],[-1,-6],[-1,-7],[-1,-8],
+      [1,-3],[1,-4],[1,-5],[1,-6],[1,-7],[1,-8],
+      [-2,-5],[-2,-6],[-2,-7],
+      [2,-5],[2,-6],[2,-7],
+      [-3,-6],[-3,-7],
+      [3,-6],[3,-7],
+    ];
+
+    // White south half
+    const whitePixels = [
+      [0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],
+      [-1,3],[-1,4],[-1,5],[-1,6],[-1,7],[-1,8],
+      [1,3],[1,4],[1,5],[1,6],[1,7],[1,8],
+      [-2,5],[-2,6],[-2,7],
+      [2,5],[2,6],[2,7],
+      [-3,6],[-3,7],
+      [3,6],[3,7],
+    ];
+
+    // Dark red shading
+    const darkRedPixels = [
+      [-1,-3],[-1,-4],[-1,-5],[-1,-6],[-1,-7],[-1,-8],
+      [-2,-5],[-2,-6],[-2,-7],[-3,-6],[-3,-7],
+    ];
+
+    // Gray shading on white
+    const grayPixels = [
+      [1,3],[1,4],[1,5],[1,6],[1,7],[1,8],
+      [2,5],[2,6],[2,7],[3,6],[3,7],
+    ];
+
+    const p = PX * 0.7;
+
+    redPixels.forEach(([x,y]) => {
+      ctx.fillStyle = '#cc2222';
+      ctx.fillRect(x*p - p/2, y*p - p/2, p, p);
+    });
+    darkRedPixels.forEach(([x,y]) => {
+      ctx.fillStyle = '#881111';
+      ctx.fillRect(x*p - p/2, y*p - p/2, p, p);
+    });
+    whitePixels.forEach(([x,y]) => {
+      ctx.fillStyle = '#dddddd';
+      ctx.fillRect(x*p - p/2, y*p - p/2, p, p);
+    });
+    grayPixels.forEach(([x,y]) => {
+      ctx.fillStyle = '#aaaaaa';
+      ctx.fillRect(x*p - p/2, y*p - p/2, p, p);
+    });
+
+    // Center pixel
+    ctx.fillStyle = '#555555';
+    ctx.fillRect(-p, -p, p*2, p*2);
+    ctx.fillStyle = '#333333';
+    ctx.fillRect(-p/2, -p/2, p, p);
+
+    ctx.restore();
+  }
+
+  function renderCompass() {
+    drawCompassBody();
+    drawNeedle(smoothAngle);
+    requestAnimationFrame(renderCompass);
+  }
+
+  // ===== LOGIC =====
   function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,e=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(e),Math.sqrt(1-e));}
   function calcBearing(a,b,c,d){const p1=a*Math.PI/180,p2=c*Math.PI/180,dl=(d-b)*Math.PI/180,y=Math.sin(dl)*Math.cos(p2),x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);return(Math.atan2(y,x)*180/Math.PI+360)%360;}
 
-  function animate(){
-    if(hasLocation){const raw=targetBearing-currentHeading,delta=((raw-smoothAngle+540)%360)-180;smoothAngle=(smoothAngle+delta*0.12+360)%360;document.getElementById('needleWrap').style.transform=`rotate(${smoothAngle}deg)`;}
-    requestAnimationFrame(animate);
+  function updateSmooth(){
+    if(hasLocation){const raw=targetBearing-currentHeading,delta=((raw-smoothAngle+540)%360)-180;smoothAngle=(smoothAngle+delta*0.12+360)%360;}
+    setTimeout(updateSmooth, 16);
   }
 
   function startLocation(){
@@ -444,7 +363,6 @@
       document.getElementById('latVal').textContent=lat.toFixed(4);
       document.getElementById('lngVal').textContent=lng.toFixed(4);
       document.getElementById('bearVal').textContent=Math.round(targetBearing)+'°';
-      if(dist<30)document.getElementById('compass').classList.add('locked');
     },err=>{showError(err.code===1?'Геолокация запрещена.':'Ошибка: '+err.message);},{enableHighAccuracy:true,maximumAge:1000});
   }
 
@@ -459,7 +377,10 @@
   document.getElementById('startBtn').addEventListener('click',()=>{
     document.getElementById('overlay').classList.add('hidden');
     document.getElementById('mainApp').classList.remove('hidden');
-    startLocation();startOrientation();requestAnimationFrame(animate);
+    startLocation();
+    startOrientation();
+    updateSmooth();
+    renderCompass();
   });
 </script>
 </body>
